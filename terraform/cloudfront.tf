@@ -10,7 +10,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   }
 
   enabled             = true
-  comment             = "Some comment"
+  comment             = "Static Website using S3 and Cloudfront OAC"
   default_root_object = "index.html"
 
   default_cache_behavior {

@@ -14,10 +14,10 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   default_root_object = "index.html"
 
   default_cache_behavior {
-    cache_policy_id  = data.aws_cloudfront_cache_policy.example.id
-    allowed_methods  = ["GET", "HEAD"]
-    cached_methods  = ["GET", "HEAD"]
-    target_origin_id = "S3Origin"
+    cache_policy_id        = data.aws_cloudfront_cache_policy.example.id
+    allowed_methods        = ["GET", "HEAD"]
+    cached_methods         = ["GET", "HEAD"]
+    target_origin_id       = "S3Origin"
     viewer_protocol_policy = "allow-all"
     min_ttl                = 0
     default_ttl            = 3600
@@ -37,9 +37,9 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
 }
 
 resource "aws_cloudfront_origin_access_control" "oac" {
-	name                              = "${aws_s3_bucket.static_web.id}-oac"
-	description                       = ""
-	origin_access_control_origin_type = "s3"
-	signing_behavior                  = "always"
-	signing_protocol                  = "sigv4"
+  name                              = "${aws_s3_bucket.static_web.id}-oac"
+  description                       = ""
+  origin_access_control_origin_type = "s3"
+  signing_behavior                  = "always"
+  signing_protocol                  = "sigv4"
 }

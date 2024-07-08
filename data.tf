@@ -5,7 +5,6 @@ data "aws_cloudfront_cache_policy" "example" {
 data "aws_iam_policy_document" "default" {
   statement {
     actions = ["s3:GetObject"]
-
     resources = ["${aws_s3_bucket.static_web.arn}/*"]
 
     principals {
@@ -18,4 +17,12 @@ data "aws_iam_policy_document" "default" {
       values   = [aws_cloudfront_distribution.s3_distribution.arn]
     }
   }
+}
+
+data "aws_acm_certificate" "name" {
+  domain = "sctp-sandbox.com"
+}
+
+data "aws_route53_zone" "sctp_zone" {
+  name = "sctp-sandbox.com"
 }

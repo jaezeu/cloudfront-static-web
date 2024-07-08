@@ -3,7 +3,7 @@ locals {
 }
 
 resource "aws_s3_bucket" "static_web" {
-  bucket = var.bucket_name
+  bucket = "jaz-cloudfront-s3-bucket"
 }
 
 resource "aws_s3_bucket_policy" "allow_access_from_cloudfront" {
@@ -19,19 +19,20 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   }
 
   enabled             = true
-  comment             = "Static Website using S3 and Cloudfront OAC"
+  comment             = "Jaz's static website using Cloudfront"
   default_root_object = "index.html"
 
   default_cache_behavior {
     cache_policy_id        = data.aws_cloudfront_cache_policy.example.id
-    allowed_methods        = var.allowed_methods
-    cached_methods         = var.cached_methods
+    allowed_methods        = ["GET","HEAD"]
+    cached_methods         = ["GET","HEAD"]
     target_origin_id       = local.origin_id
-    viewer_protocol_policy = var.viewer_protocol_policy
+    viewer_protocol_policy = "allow-all"
   }
 
   viewer_certificate {
-    cloudfront_default_certificate = true
+    acm_certificate_arn = data.aws_acm_certificate.name.arn
+    ssl_support_method  = "sni-only"
   }
 
   restrictions {
@@ -43,8 +44,20 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
 }
 
 resource "aws_cloudfront_origin_access_control" "oac" {
-  name                              = "${aws_s3_bucket.static_web.id}-oac"
+  name                              = "jaz-cloudfront-oac"  #Change this, e.g. <yourname>-cloudfront-oac, jaz-cloudfront-oac
   origin_access_control_origin_type = "s3"
   signing_behavior                  = "always"
   signing_protocol                  = "sigv4"
+}
+
+resource "aws_route53_record" "www" {
+  zone_id = data.aws_route53_zone.sctp_zone.zone_id  #Zone ID of hosted zone: sctp-sandbox.com
+  name    = "jazeel-cloudfront"                       # Record name
+  type    = "A"
+
+  alias {
+    name                   = aws_cloudfront_distribution.s3_distribution.domain_name  #Cloudfront attribute:domain_name
+    zone_id                = aws_cloudfront_distribution.s3_distribution.hosted_zone_id                  # Hosted zone of the S3 bucket, Attribute: hosted_zone_id
+    evaluate_target_health = true
+  }
 }

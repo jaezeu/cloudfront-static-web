@@ -23,6 +23,8 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   comment             = "Jaz's static website using Cloudfront" #Description
   default_root_object = "index.html"
 
+  web_acl_id = aws_wafv2_web_acl.example.arn
+
   aliases = ["jazeel-cloudfront.sctp-sandbox.com"] #Cloudfront alternate domain name (Same as Route53)
 
   default_cache_behavior {
